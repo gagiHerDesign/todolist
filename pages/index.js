@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import SimpleTable from '../components/simpleTable'
 
 export default function Home() {
   const [data, setData] = useState([0])
@@ -9,6 +10,7 @@ export default function Home() {
       const res = await fetch(process.env.NEXT_PUBLIC_WEB_TASK)
       const data = await res.json()
       console.log("data", (data))
+      console.log("data", (data[0].id))
       setData(data)
     } catch (error) {
       console.log("error", error)
@@ -32,18 +34,7 @@ export default function Home() {
             Hello world!
           </h1>
           <button onClick={getData}>666</button>
-          {/* 印出回傳值 */}
-          {
-            data.map((item, i) => {
-              return (
-                <ul key={i}>
-                  <li>{data[i].id}</li>
-                  <li>{data[i].name}</li>
-                  <li>{data[i].description}</li>
-                </ul>
-              )
-            })
-          }
+          <SimpleTable />
         </section>
         {/* 編輯/新增 */}
         <section className="flex-auto w-5/6 md:w-3/6 h-2/3 border-4">
