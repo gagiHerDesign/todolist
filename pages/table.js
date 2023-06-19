@@ -1,74 +1,69 @@
-import * as React from 'react';
-import { useState, useEffect } from 'react'
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
-import { DataGrid } from '@mui/x-data-grid';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useTable } from 'react-table';
 
-const columns = [
-  { field: 'id', headerName: 'ID' },
-  { field: 'name', headerName: 'Name', width: 100 },
-  { field: 'description', headerName: 'Description', width: 300 },
-  { field: 'created_at', headerName: '創建時間' },
-  { field: 'updated_at', headerName: '更新時間' },
-  { field: 'is_completed', headerName: '完成' }
-]
-
-
-export default function DataTable() {
-  const [tableData, setTableData] = useState([])
-
-  // 取得資料
-  const getData = async () => {
-    try {
-      const res = await fetch(process.env.NEXT_PUBLIC_WEB_TASK)
-      const data = await res.json()
-      console.log("data", (data))
-      setTableData(data)
-    } catch (error) {
-      console.log("error", error)
-    }
-  }
+const MyTable = () => {
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch("https://wt-tp-service.wanin.tw/WebClientInterview/task")
-      .then((data) => data.json())
-      .then((data) => setTableData(data))
-
-  }, [])
-
-
-
-  return (
-    <div style={{ height: 400, width: '100%', color: 'white' }}>
-      <DataGrid
-        rows={tableData}
-        columns={columns}
-        getRowId={(data) => data.id}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
-          },
-        }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-      />
-      {/* 印出回傳值 */}
-
-      <Button onClick={getData}>重新取得資料</Button>
-
-      {
-        tableData.map((item, i) => {
-          return (
-            <ul key={i}>
-              <li>{tableData[i].id}</li>
-              <li>{tableData[i].name}</li>
-              <li>{tableData[i].description}</li>
-            </ul>
-          )
-        })
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('https://api.tvmaze.com/search/shows?q=snow');
+        setData(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-    </div>
-  );
-}
+    };
 
+    fetchData();
+  }, []);
+  console.log("data", data);
 
+  const columns = [
+    {
+      Header: 'Show',
+      accessor: 'show.name',
+    },
+    {
+      Header: 'Language',
+      accessor: 'show.language',
+    },
+    {
+      Header: 'Type',
+      accessor: 'show.type',
+    },
+  ];
+
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
+    columns,
+    data,
+  });
+
+  // return (
+  //   <table {...getTableProps()} className="table">
+  //     <thead>
+  //       {headerGroups.map(headerGroup => (
+  //         <tr {...headerGroup.getHeaderGroupProps()} key={i}>
+  //           {headerGroup.headers.map(column => (
+  //             <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+  //           ))}
+  //         </tr>
+  //       ))}
+  //     </thead>
+  //     <tbody {...getTableBodyProps()}>
+  //       {rows.map(row => {
+  //         prepareRow(row);
+  //         return (
+  //           <tr {...row.getRowProps()}>
+  //             {row.cells.map(cell => (
+  //               <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+  //             ))}
+  //           </tr>
+  //         );
+  //       })}
+  //     </tbody>
+  //   </table>
+  // );
+};
+
+export default MyTable;
